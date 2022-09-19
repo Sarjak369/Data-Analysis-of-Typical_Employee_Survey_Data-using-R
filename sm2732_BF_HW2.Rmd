@@ -1,0 +1,246 @@
+---
+title: "sm2732_BF_HW2"
+output: html_document
+date: "2022-09-19"
+---
+
+
+```{r}
+
+# Business Forecasting HW2
+# Name - Sarjak Atul Maniar
+# Email - sm2732@scarletmail.rutgers.edu
+
+#                                           Typical Industries Employee Survey
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+library(readr)  # to use read_csv function 
+library("ggplot2") 
+library(dbplyr)
+library(tidyverse)
+
+getwd() # to get current working directory
+
+myData <- read_csv('Typical_Employee_Survey_Data.csv')
+head(myData)
+
+df <- data.frame(myData)  # creating the data frame for our data
+head(df) # printing first 6 values
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Exploring the Data Frame
+
+names(df)
+ncol(df)
+nrow(df)
+dim(df)
+head(df)
+tail(df)
+str(df)
+class(df$age)
+str(df)   # whole structure of our data
+unique(df$age) # this will print all the unique values of age column
+unique(df$gender) # this will print all the unique values of gender column
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Column
+
+df$age  # or we can write df[1]
+df[2]
+df[c("age")]
+df[7:10]
+df[c("age","gender")]
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Rows
+df[2,]    # we must put ',' here because otherwise it will print the column. So the machine should be able to differentiate.
+head(df)
+df[3,5]    # this will simply print the coordinates [row, column]
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Combined
+df[3:5,c("gender")]   # 3rd, 4th and 5th row of gender column  
+df[5:6,2:3]   # Note this: [1st_parameter -> row_value, 2nd_parameter -> column_value]
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+#Levels
+
+df$gender   # this will print all the values of gender column
+table(df$gender)  # this will print the frequency of distinct values
+table(df$age)   
+table(df$likeliness_of_promotion)
+table(df$years_of_experience)
+head(df)
+table(df$age, df$gender)   # this gives the frequency of one parameter(column) with respect to other...
+table(df$age, df$job_satisfication, df$likeliness_of_promotion)
+
+df$age[df$job_satisfication == "1" & df$likeliness_of_promotion == "1"] 
+# here we are printing the ages of all the people who have job satisfaction (very satisfied) and will be promoted (very likely). 
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Filtering
+
+# Note: we put ',' to print all the other columns with respect to the column used in the parameter.
+df[df$gender == "1",]   # 1 -> Male, 2 -> Female,   this will print all the column values of all the rows whose gender is 1 i.e Male
+
+df$age[df$gender == "1"]   # this will print the age of all the people whose gender is Male.
+
+head(df)
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Ordering
+
+df[order(df$age),]    # this will sort the values of age in ascending order
+df[order(-df$age),]   # this will sort the values of age in descending order
+
+head(df)
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Change Column Name
+names(df)[3] <- "satisfaction_of_job"
+names(df)
+
+# Changing the age of the first person
+df[1,1] <- 27  # from 35 to 27
+df[1]
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Graphing
+head(df)
+barplot(df$age)
+barplot(df$gender)
+barplot(df$age, main = "Age of People", xlab = "People", ylab = "Age", col = "Green", names.arg = df$Name)
+# names.arg:
+# a vector of names to be plotted below each bar or group of bars.If this argument is omitted, 
+# then the names are taken from the names attribute of height if this is a vector, or the column 
+# names if it is a matrix.
+
+pie(df$budgetary_decisions)
+pie(df$age,label = df$Name, main = "Age of People")
+stem(df$gender)
+stem(df$age)
+hist(df$age)
+hist(df$gender)    # so we can see that male population is more than female population
+boxplot(df$age)    
+# The box of a boxplot starts in the first quartile (25%) and ends in the third (75%). 
+# Hence, the box represents the 50% of the central data, with a line inside that represents the median.
+boxplot(df$age,df$gender)
+
+max(df$age)  # 64
+min(df$age)  # 20
+
+# so the range of age is from 20 to 64
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Trying other interesting things :D
+
+# Calculating total number of people whose age is 22
+length(which(df$age==20))  # 1
+
+# Calculating total number of Males
+length(which(df$gender==1))
+
+# Calculating total number of Females
+length(which(df$gender==2))
+
+
+# Getting the max value of years_of_experience
+max(df$years_of_experience)  # 52.25
+
+# Now, as we got the max value of years_of_experience, let us see the age of that particular person who has the highest work experience
+df$age[which(df$years_of_experience == 52.25)]   # 62
+
+# We can see this by plotting the graph below.. 
+
+ggplot(data = df) +
+  geom_point(aes(x = years_of_experience, y = age), shape = "cross", size = 2, color = "blue")
+# Sow, we can see that the person with highest work experience is not the one who has the highest age number :)
+
+range(df$years_of_experience) # 0.08 52.25
+
+# Getting all the ages whose proudness value is 1
+df$age[which(df$proudness == 1)] 
+
+# Getting all the ages whose turn_down_job value is 1
+df$age[which(df$turn_down_job == 1)]
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Summary Stats
+
+min(df$age) # 20
+max(df$age) # 64
+range(df$age)
+StatRange = max(df$age) - min(df$age)
+StatRange
+mean(df$age)
+sd(df$age)
+var(df$age)
+sqrt(var(df$age))
+fivenum(df$age)
+IQR(df$age)
+quantile(df$age)
+summary(df$age)
+boxplot.stats(df$age)
+boxplot.stats(df$age)$out
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Data Frame Summary
+
+summary(df)
+
+by(df$age,df$gender,sd)
+by(df$age,df$gender,summary)
+by(df$age,df$gender,mean)
+
+aggregate(df$age,list("Type" = df$gender),median)
+aggregate(df$age,list("Type" = df$gender),summary)
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Some more visualizations
+
+unique(df$years_of_experience)
+min(df$years_of_experience) # 8
+max(df$years_of_experience) # 52.25
+range(df$years_of_experience)
+
+# Plotting a graph which shows the years of experience of both Males and Females. We can see that Male population has higher work experience
+ggplot(data = df,aes(years_of_experience))+ geom_histogram(binwidth = 3, col='black', fill='blue', alpha = 0.4) + facet_wrap(~gender)
+
+# Plotting a graph of gender vs likeliness_of_promotion. 
+df %>% count(gender)%>%ggplot(aes(gender,n)) + geom_bar(stat = 'identity', fill = 'purple', alpha = 0.3, col = "black") +
+  xlab('gender ') + ylab('likeliness_of_promotion')
+
+# proudness vs age 
+ggplot(data = df) +
+  geom_point(aes(x = proudness, y = age), shape = "circle", size = 2, color = "purple")
+
+# turn_down vs age 
+ggplot(data = df) +
+  geom_point(aes(x = turn_down_job, y = age), shape = "circle", size = 2, color = "purple")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
